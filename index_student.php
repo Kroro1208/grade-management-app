@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>Grade Management APP</title>
+    <title>生徒一覧</title>
 </head>
 
 <body>
@@ -21,7 +21,7 @@
         session_start();
         if (isset($_SESSION['msg'])) {
             echo "<div class='alert alert-success'>{$_SESSION['msg']}</div>";
-            unset($_SESSION['msg']); // メッセージを一度表示したらセッションから削除
+            unset($_SESSION['msg']);
         }
         ?>
 
@@ -39,7 +39,7 @@
             </thead>
             <tbody>
                 <?php
-                include("conf/connect.php"); // パスを正しく修正
+                include("conf/connect.php");
                 $stmt = $conn->prepare("SELECT * FROM students");
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -54,7 +54,7 @@
                         <td><?php echo htmlspecialchars($row["gender"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["birthday"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td>
-                            <a href="view.php?id=<?php echo $row["id"] ?>" class="btn btn-info">生徒の詳細を見る</a>
+                            <a href="index_test.php?student_id=<?php echo $row["id"] ?>" class="btn btn-success">成績を見る</a>
                             <a href="edit.php?id=<?php echo $row["id"] ?>" class="btn btn-warning">編集する</a>
                             <a href="delete.php?id=<?php echo $row["id"] ?>" class="btn btn-danger">削除する</a>
                         </td>
@@ -68,7 +68,6 @@
             </tbody>
         </table>
     </div>
-
 </body>
 
 </html>
