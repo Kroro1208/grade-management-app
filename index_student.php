@@ -57,7 +57,9 @@
                         <td>
                             <a href="index_test.php?student_id=<?php echo $row["id"] ?>" class="btn btn-success">成績を見る</a>
                             <a href="crud/edit/edit_student.php?id=<?php echo $row["id"] ?>" class="btn btn-warning">編集する</a>
-                            <a href="delete.php?id=<?php echo $row["id"] ?>" class="btn btn-danger">削除する</a>
+                            <a href="crud/delete/delete_student.php?id=<?php echo $row["id"] ?>" class="btn btn-danger" onclick="return confirm('本当にこの生徒情報を削除しますか？')">
+                                削除する
+                            </a>
                         </td>
                     </tr>
                 <?php

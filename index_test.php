@@ -94,8 +94,8 @@
                                 <td><?php echo htmlspecialchars($row["total"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
                                     <a href="crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-warning">編集する</a>
-                                    <a href="crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-danger">削除する</a>
-                                </td>
+                                    <a href="crud/delete/delete_test.php?id=<?php echo $row["score_id"]; ?>" class="btn btn-danger" onclick="return confirm('本当にこの成績情報を削除しますか？')">削除する</a>
+                                    </td>
                             </tr>
                         <?php
                         }
