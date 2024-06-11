@@ -45,17 +45,18 @@
                 $result = $stmt->get_result();
 
                 while ($row = $result->fetch_assoc()) {
+                    $gender_display = ($row["gender"] == "male") ? "男性" : (($row["gender"] == "female") ? "女性" : "不明");
                 ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["last_name"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["first_name"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["age"], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($row["gender"], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($gender_display, ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["birthday"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td>
                             <a href="index_test.php?student_id=<?php echo $row["id"] ?>" class="btn btn-success">成績を見る</a>
-                            <a href="edit.php?id=<?php echo $row["id"] ?>" class="btn btn-warning">編集する</a>
+                            <a href="crud/edit/edit_student.php?id=<?php echo $row["id"] ?>" class="btn btn-warning">編集する</a>
                             <a href="delete.php?id=<?php echo $row["id"] ?>" class="btn btn-danger">削除する</a>
                         </td>
                     </tr>

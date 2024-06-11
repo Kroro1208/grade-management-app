@@ -63,13 +63,14 @@
                             <th>社会</th>
                             <th>理科</th>
                             <th>合計</th>
+                            <th>アクション</th> <!-- 編集ボタン用の列を追加 -->
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         // 成績を取得
                         $stmt = $conn->prepare("
-                            SELECT tt.name AS test_type, t.test_date, s.english, s.japanese, s.math, s.social, s.science,
+                            SELECT t.id AS test_id, tt.name AS test_type, t.test_date, s.english, s.japanese, s.math, s.social, s.science,
                                    (s.english + s.japanese + s.math + s.social + s.science) AS total
                             FROM subjects s
                             JOIN tests t ON s.test_id = t.id
@@ -91,6 +92,10 @@
                                 <td><?php echo htmlspecialchars($row["social"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["science"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["total"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td>
+                                    <a href="crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-warning">編集する</a>
+                                    <a href="crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-danger">削除する</a>
+                                </td>
                             </tr>
                         <?php
                         }
