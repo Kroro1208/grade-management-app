@@ -14,6 +14,7 @@
             <h1>生徒一覧</h1>
             <div>
                 <a href="crud/create/create_student.php" class="btn btn-primary">生徒を追加する</a>
+                <a href="index.php" class="btn btn-dark">戻る</a>
             </div>
         </header>
 
