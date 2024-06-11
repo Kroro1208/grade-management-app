@@ -2,8 +2,8 @@
 
 ## create 機能
 
-![途中経過]("/grade.gif")
+![途中経過](/grade.gif)
 
 ## edit 機能
 
-![途中経過]("/grade-edit.gif")
+![途中経過](/grade-edit.gif)
