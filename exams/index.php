@@ -1,23 +1,26 @@
 <?php
 // データベース接続
-include("conf/connect.php");
+include("../conf/connect.php");
 
-// 生徒の成績を合計し、ランキング順に取得するクエリ
+// テスト結果を取得するクエリ
 $query = "
     SELECT 
-        s.id, 
-        s.first_name, 
-        s.last_name, 
-        s.age, 
-        s.gender, 
-        s.birthday, 
-        COALESCE(SUM(sb.english + sb.japanese + sb.math + sb.social + sb.science), 0) AS total_score 
-    FROM students s
-    LEFT JOIN subjects sb ON s.id = sb.student_id
-    GROUP BY s.id
-    ORDER BY total_score DESC";
-$result = $conn->query($query);
+        s.id AS student_id, 
+        CONCAT(s.last_name, ' ', s.first_name) AS student_name, 
+        tt.name AS test_type, 
+        sub.english, 
+        sub.math, 
+        sub.science, 
+        sub.social, 
+        sub.japanese, 
+        (sub.english + sub.math + sub.science + sub.social + sub.japanese) AS total_score
+    FROM subjects sub
+    JOIN students s ON sub.student_id = s.id
+    JOIN tests t ON sub.test_id = t.id
+    JOIN testtypes tt ON t.test_type_id = tt.id
+";
 
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +30,7 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>成績管理アプリ</title>
+    <title>テスト結果一覧</title>
     <style>
         body {
             background-color: #f4f4f9;
@@ -91,37 +94,38 @@ $result = $conn->query($query);
     <div class="container mt-5">
         <div class="card">
             <div class="card-header">
-                成績管理アプリ
+                テスト結果一覧
             </div>
             <div class="card-body text-center">
-                <a href="index_student.php" class="btn btn-primary btn-custom btn-primary-custom">生徒一覧へ</a>
-                <a href="./exams/index.php" class="btn btn-secondary btn-custom btn-secondary-custom mt-3">テスト結果一覧へ</a>
-                <h2 class="mt-4">成績ランキング</h2>
+                <a href="../index.php" class="btn btn-secondary btn-custom btn-secondary-custom">ホームに戻る</a>
+                <a href="download.php" class="btn btn-primary btn-custom btn-primary-custom mt-3">CSVダウンロード</a>
                 <table class="table table-striped table-hover mt-3">
                     <thead class="table-dark">
                         <tr>
-                            <th>順位</th>
-                            <th>苗字</th>
+                            <th>学生番号</th>
+                            <th>テスト</th>
                             <th>名前</th>
-                            <th>年齢</th>
-                            <th>性別</th>
-                            <th>誕生日</th>
-                            <th>合計得点</th>
+                            <th>英語</th>
+                            <th>数学</th>
+                            <th>理科</th>
+                            <th>社会</th>
+                            <th>国語</th>
+                            <th>合計</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $rank = 1;
                         while ($row = $result->fetch_assoc()) {
-                            $gender_display = ($row["gender"] == "male") ? "男性" : (($row["gender"] == "female") ? "女性" : "不明");
                         ?>
                             <tr>
-                                <td><?php echo $rank++; ?></td>
-                                <td><?php echo htmlspecialchars($row["last_name"], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($row["first_name"], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($row["age"], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($gender_display, ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo htmlspecialchars($row["birthday"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["student_id"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["test_type"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["student_name"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["english"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["math"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["science"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["social"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["japanese"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["total_score"], ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                         <?php
