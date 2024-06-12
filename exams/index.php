@@ -134,12 +134,12 @@ $result = $conn->query($query);
                             <th onclick="sortTable(0, true)">学生番号<i class="bi bi-caret-down-fill sort-icon"></i></th>
                             <th onclick="sortTable(1)">テスト<i class="bi bi-caret-down-fill sort-icon"></i></th>
                             <th onclick="sortTable(2)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(3)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(4)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(5)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(6)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(7)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(8)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(3, true)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(4, true)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(5, true)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(6, true)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(7, true)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(8, true)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -168,16 +168,11 @@ $result = $conn->query($query);
 
     <script>
         function sortTable(columnIndex, isNumeric = false) {
-            let table, rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
-            table = document.getElementById("resultsTable");
-            switching = true;
-            dir = "asc";
-
-            // Remove previous sorted class
-            let headers = table.getElementsByTagName("TH");
-            for (let j = 0; j < headers.length; j++) {
-                headers[j].classList.remove("sorted-asc", "sorted-desc");
-            }
+            const table = document.getElementById("resultsTable");
+            let dir = "asc";
+            let rows, i, x, y, switchCount = 0;
+            let switching = true;
+            let shouldSwitch = false;
 
             while (switching) {
                 switching = false;
@@ -190,7 +185,7 @@ $result = $conn->query($query);
 
                     if (dir == "asc") {
                         if (isNumeric) {
-                            if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
+                            if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
                                 shouldSwitch = true;
                                 break;
                             }
@@ -202,7 +197,7 @@ $result = $conn->query($query);
                         }
                     } else if (dir == "desc") {
                         if (isNumeric) {
-                            if (parseInt(x.innerHTML) < parseInt(y.innerHTML)) {
+                            if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
                                 shouldSwitch = true;
                                 break;
                             }
@@ -226,15 +221,9 @@ $result = $conn->query($query);
                     }
                 }
             }
-
-            // Add sorted class to header
-            if (dir == "asc") {
-                headers[columnIndex].classList.add("sorted-asc");
-            } else {
-                headers[columnIndex].classList.add("sorted-desc");
-            }
         }
     </script>
+
 </body>
 
 </html>
