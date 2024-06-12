@@ -170,54 +170,48 @@ $result = $conn->query($query);
         function sortTable(columnIndex, isNumeric = false) {
             const table = document.getElementById("resultsTable");
             let dir = "asc";
-            let rows, i, x, y, sortCount = 0;
-            let sorted = true;
+            let rows, i, x, y;
+            let sortCount = 0;
+            let sorted = true; // ソートが完了したかどうかのフラグ
             let shouldSort = false; // 次の行と比較して並び替えが必要かどうかを判断するフラグ
 
+            // ソートが必要ないか、すべてのソートが完了するまでループ
             while (sorted) {
+                sorted = false; // ループの開始時にフラグをリセット
                 rows = table.rows;
-                sorted = false;
 
+                // テーブルの各行をループ処理
                 for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSort = false;
+                    shouldSort = false; // ループの開始時にフラグをリセット
                     x = rows[i].getElementsByTagName("td")[columnIndex];
                     y = rows[i + 1].getElementsByTagName("td")[columnIndex];
 
-                    if (dir == "asc") {
-                        if (isNumeric) {
-                            if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
-                                shouldSort = true;
-                                break;
-                            }
-                        } else {
-                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                shouldSort = true;
-                                break;
-                            }
+                    // 数値か文字列かによって比較方法を変更
+                    if (dir === "asc") {
+                        if ((isNumeric && parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) ||
+                            (!isNumeric && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())) {
+                            shouldSort = true;
+                            break;
                         }
-                    } else if (dir == "desc") {
-                        if (isNumeric) {
-                            if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
-                                shouldSort = true;
-                                break;
-                            }
-                        } else {
-                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                shouldSort = true;
-                                break;
-                            }
+                    } else if (dir === "desc") {
+                        if ((isNumeric && parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) ||
+                            (!isNumeric && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())) {
+                            shouldSort = true;
+                            break;
                         }
                     }
                 }
 
+                // shouldSortフラグがtrueの場合、行を入れ替える
                 if (shouldSort) {
                     rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    sorted = true;
-                    sortCount++;
+                    sorted = true; // ソートが行われたのでフラグをtrueに戻す
+                    sortCount++; // ソート回数をインクリメント
                 } else {
-                    if (sortCount == 0 && dir == "asc") {
+                    // 一度もソートされていない場合、ソート方向を変更
+                    if (sortCount === 0 && dir === "asc") {
                         dir = "desc";
-                        sorted = true;
+                        sorted = true; // ソート方向を変更したのでフラグをtrueに戻す
                     }
                 }
             }
