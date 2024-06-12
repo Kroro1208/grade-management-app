@@ -170,54 +170,54 @@ $result = $conn->query($query);
         function sortTable(columnIndex, isNumeric = false) {
             const table = document.getElementById("resultsTable");
             let dir = "asc";
-            let rows, i, x, y, switchCount = 0;
-            let switching = true;
-            let shouldSwitch = false;
+            let rows, i, x, y, sortCount = 0;
+            let sorted = true;
+            let shouldSort = false; // 次の行と比較して並び替えが必要かどうかを判断するフラグ
 
-            while (switching) {
-                switching = false;
+            while (sorted) {
                 rows = table.rows;
+                sorted = false;
 
                 for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false;
-                    x = rows[i].getElementsByTagName("TD")[columnIndex];
-                    y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+                    shouldSort = false;
+                    x = rows[i].getElementsByTagName("td")[columnIndex];
+                    y = rows[i + 1].getElementsByTagName("td")[columnIndex];
 
                     if (dir == "asc") {
                         if (isNumeric) {
                             if (parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
-                                shouldSwitch = true;
+                                shouldSort = true;
                                 break;
                             }
                         } else {
                             if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
+                                shouldSort = true;
                                 break;
                             }
                         }
                     } else if (dir == "desc") {
                         if (isNumeric) {
                             if (parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) { // parseIntをparseFloatに変更
-                                shouldSwitch = true;
+                                shouldSort = true;
                                 break;
                             }
                         } else {
                             if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
+                                shouldSort = true;
                                 break;
                             }
                         }
                     }
                 }
 
-                if (shouldSwitch) {
+                if (shouldSort) {
                     rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    switchCount++;
+                    sorted = true;
+                    sortCount++;
                 } else {
-                    if (switchCount == 0 && dir == "asc") {
+                    if (sortCount == 0 && dir == "asc") {
                         dir = "desc";
-                        switching = true;
+                        sorted = true;
                     }
                 }
             }
