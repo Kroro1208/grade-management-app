@@ -204,14 +204,16 @@ $result = $conn->query($query);
 
                 // shouldSortフラグがtrueの場合、行を入れ替える
                 if (shouldSort) {
+                    // table.rowsが<tr>を含むすべての要素
+                    // insertBeforeは、親ノードである<tbody>の子ノードの順序を変更する。
                     rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    sorted = true; // ソートが行われたのでフラグをtrueに戻す
-                    sortCount++; // ソート回数をインクリメント
+                    sorted = true;
+                    sortCount++;
                 } else {
-                    // 一度もソートされていない場合、ソート方向を変更
+                    // ソート失敗時
                     if (sortCount === 0 && dir === "asc") {
                         dir = "desc";
-                        sorted = true; // ソート方向を変更したのでフラグをtrueに戻す
+                        sorted = true;
                     }
                 }
             }
