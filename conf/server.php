@@ -65,8 +65,8 @@ if (isset($_POST["create_test"])) {
     $social = isset($_POST["social"]) ? intval($_POST["social"]) : null;
     $science = isset($_POST["science"]) ? intval($_POST["science"]) : null;
 
-    // testtypes テーブルからテスト種類のIDを取得または挿入
-    $stmt = $conn->prepare("SELECT id FROM testtypes WHERE name = ?");
+    // test_types テーブルからテスト種類のIDを取得または挿入
+    $stmt = $conn->prepare("SELECT id FROM test_types WHERE name = ?");
     $stmt->bind_param("s", $test_type_name);
     $stmt->execute();
     $stmt->store_result();
@@ -75,7 +75,7 @@ if (isset($_POST["create_test"])) {
         $stmt->fetch();
     } else {
         $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO testtypes (name) VALUES (?)");
+        $stmt = $conn->prepare("INSERT INTO test_types (name) VALUES (?)");
         $stmt->bind_param("s", $test_type_name);
         $stmt->execute();
         $test_type_id = $stmt->insert_id;
@@ -120,8 +120,8 @@ if (isset($_POST["update_test"])) {
     $social = isset($_POST["social"]) ? intval($_POST["social"]) : null;
     $science = isset($_POST["science"]) ? intval($_POST["science"]) : null;
 
-    // testtypes テーブルからテスト種類のIDを取得または挿入
-    $stmt = $conn->prepare("SELECT id FROM testtypes WHERE name = ?");
+    // test_types テーブルからテスト種類のIDを取得または挿入
+    $stmt = $conn->prepare("SELECT id FROM test_types WHERE name = ?");
     $stmt->bind_param("s", $test_type_name);
     $stmt->execute();
     $stmt->store_result();
@@ -130,7 +130,7 @@ if (isset($_POST["update_test"])) {
         $stmt->fetch();
     } else {
         $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO testtypes (name) VALUES (?)");
+        $stmt = $conn->prepare("INSERT INTO test_types (name) VALUES (?)");
         $stmt->bind_param("s", $test_type_name);
         $stmt->execute();
         $test_type_id = $stmt->insert_id;
@@ -159,4 +159,3 @@ if (isset($_POST["update_test"])) {
     header("Location: ../index_student.php");
     exit();
 }
-

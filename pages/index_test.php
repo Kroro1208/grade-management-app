@@ -1,4 +1,5 @@
 <?php
+include("components/auth.php");
 // データベース接続とクエリの実行
 include("conf/connect.php");
 $student_id = intval($_GET['student_id']);
@@ -8,7 +9,7 @@ $stmt = $conn->prepare("
            (s.english + s.japanese + s.math + s.social + s.science) AS total
     FROM subjects s
     JOIN tests t ON s.test_id = t.id
-    JOIN testtypes tt ON t.test_type_id = tt.id
+    JOIN test_types tt ON t.test_type_id = tt.id
     WHERE s.student_id = ?
 ");
 $stmt->bind_param("i", $student_id);

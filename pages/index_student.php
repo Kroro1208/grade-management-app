@@ -1,3 +1,7 @@
+<?php
+include("components/auth.php");
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 

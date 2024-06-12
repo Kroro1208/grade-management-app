@@ -17,7 +17,7 @@ $query = "
     FROM subjects sub
     JOIN students s ON sub.student_id = s.id
     JOIN tests t ON sub.test_id = t.id
-    JOIN testtypes tt ON t.test_type_id = tt.id
+    JOIN test_types tt ON t.test_type_id = tt.id
 ";
 
 $result = $conn->query($query);

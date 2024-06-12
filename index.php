@@ -1,5 +1,5 @@
 <?php
-// データベース接続
+include("components/auth.php");
 include("conf/connect.php");
 
 // 生徒の成績を合計し、ランキング順に取得するクエリ

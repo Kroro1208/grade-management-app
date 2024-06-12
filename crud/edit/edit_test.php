@@ -25,7 +25,7 @@
         $stmt = $conn->prepare("
             SELECT t.test_date, tt.name AS test_type_name, s.english, s.japanese, s.math, s.social, s.science
             FROM tests t
-            JOIN testtypes tt ON t.test_type_id = tt.id
+            JOIN test_types tt ON t.test_type_id = tt.id
             JOIN subjects s ON t.id = s.test_id
             WHERE t.id = ?
         ");
