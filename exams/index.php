@@ -30,6 +30,7 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>テスト結果一覧</title>
     <style>
         body {
@@ -82,10 +83,38 @@ $result = $conn->query($query);
 
         .table {
             margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .table-hover tbody tr:hover {
             background-color: #e9ecef;
+        }
+
+        th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            color: #007bff;
+        }
+
+        th .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+            opacity: 0.5;
+        }
+
+        th.sorted-asc .sort-icon {
+            opacity: 1;
+        }
+
+        th.sorted-desc .sort-icon {
+            opacity: 1;
+            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -99,18 +128,18 @@ $result = $conn->query($query);
             <div class="card-body text-center">
                 <a href="../index.php" class="btn btn-secondary btn-custom btn-secondary-custom">ホームに戻る</a>
                 <a href="download.php" class="btn btn-primary btn-custom btn-primary-custom mt-3">CSVダウンロード</a>
-                <table class="table table-striped table-hover mt-3">
+                <table class="table table-striped table-hover mt-3" id="resultsTable">
                     <thead class="table-dark">
                         <tr>
-                            <th>学生番号</th>
-                            <th>テスト</th>
-                            <th>名前</th>
-                            <th>英語</th>
-                            <th>数学</th>
-                            <th>理科</th>
-                            <th>社会</th>
-                            <th>国語</th>
-                            <th>合計</th>
+                            <th onclick="sortTable(0, true)">学生番号<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(1)">テスト<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(2)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(3)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(4)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(5)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(6)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(7)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(8)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -136,6 +165,76 @@ $result = $conn->query($query);
             </div>
         </div>
     </div>
+
+    <script>
+        function sortTable(columnIndex, isNumeric = false) {
+            let table, rows, switching, i, x, y, shouldSwitch, dir, switchCount = 0;
+            table = document.getElementById("resultsTable");
+            switching = true;
+            dir = "asc";
+
+            // Remove previous sorted class
+            let headers = table.getElementsByTagName("TH");
+            for (let j = 0; j < headers.length; j++) {
+                headers[j].classList.remove("sorted-asc", "sorted-desc");
+            }
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[columnIndex];
+                    y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+
+                    if (dir == "asc") {
+                        if (isNumeric) {
+                            if (parseInt(x.innerHTML) > parseInt(y.innerHTML)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else {
+                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    } else if (dir == "desc") {
+                        if (isNumeric) {
+                            if (parseInt(x.innerHTML) < parseInt(y.innerHTML)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else {
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    if (switchCount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+
+            // Add sorted class to header
+            if (dir == "asc") {
+                headers[columnIndex].classList.add("sorted-asc");
+            } else {
+                headers[columnIndex].classList.add("sorted-desc");
+            }
+        }
+    </script>
 </body>
 
 </html>
