@@ -1,3 +1,7 @@
+<?php
+include("../../components/header.php");
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -48,7 +52,7 @@
         <header class="d-flex justify-content-between align-items-center">
             <h1 class="h3">生徒情報</h1>
             <div>
-                <a href="../../index_student.php" class="btn btn-outline-primary">戻る</a>
+                <a href="../../pages/index_student.php" class="btn btn-outline-primary">戻る</a>
             </div>
         </header>
         <form action="../../conf/server.php" method="post">

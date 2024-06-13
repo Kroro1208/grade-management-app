@@ -1,5 +1,6 @@
 <?php
 include("components/auth.php");
+include('components/header.php');
 include("conf/connect.php");
 
 // 生徒の成績を合計し、ランキング順に取得するクエリ
@@ -26,59 +27,12 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>成績管理アプリ</title>
     <style>
         body {
             background-color: #f4f4f9;
             color: #333;
-        }
-
-        .card {
-            border: none;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .card-header {
-            background-color: #007bff;
-            color: white;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            text-align: center;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .btn-custom {
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 50px;
-        }
-
-        .btn-primary-custom {
-            background-color: #007bff;
-            border: none;
-        }
-
-        .btn-primary-custom:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-secondary-custom {
-            background-color: #6c757d;
-            border: none;
-        }
-
-        .btn-secondary-custom:hover {
-            background-color: #545b62;
-        }
-
-        .table {
-            margin-top: 20px;
         }
 
         .table-hover tbody tr:hover {
@@ -90,12 +44,9 @@ $result = $conn->query($query);
 <body>
     <div class="container mt-5">
         <div class="card">
-            <div class="card-header">
-                成績管理アプリ
-            </div>
             <div class="card-body text-center">
-                <a href="index_student.php" class="btn btn-primary btn-custom btn-primary-custom">生徒一覧へ</a>
-                <a href="./exams/index.php" class="btn btn-secondary btn-custom btn-secondary-custom mt-3">テスト結果一覧へ</a>
+                <a href="pages/index_student.php" class="btn btn-success btn-custom btn-success-custom">生徒一覧へ</a>
+                <a href="pages/exams/index.php" class="btn btn-secondary btn-custom btn-secondary-custom">テスト結果一覧へ</a>
                 <h2 class="mt-4">成績ランキング</h2>
                 <table class="table table-striped table-hover mt-3">
                     <thead class="table-dark">

@@ -1,16 +1,18 @@
 <?php
 session_start();
 include("conf/connect.php");
+include('components/header.php');
 
 $error_message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
     $password = $_POST['password'];
 
-    $sql = "SELECT id, first_name, last_name, password, user_type FROM teachers WHERE username = ?";
+    $sql = "SELECT id, first_name, last_name, password, user_type FROM teachers WHERE first_name = ? AND last_name = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("ss", $first_name, $last_name);
     $stmt->execute();
     $stmt->store_result();
 
@@ -28,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error_message = 'Invalid password.';
         }
     } else {
-        $error_message = 'No user found with this username.';
+        $error_message = 'No user found with this name.';
     }
     $stmt->close();
 }
@@ -52,10 +54,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php if ($error_message) : ?>
                     <div class="alert alert-danger"><?php echo $error_message; ?></div>
                 <?php endif; ?>
-                <form method="post" action="login.php">
+                <form method="post" action="index.php">
                     <div class="form-group mb-3">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="password">Password</label>

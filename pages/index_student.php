@@ -1,5 +1,7 @@
 <?php
-include("components/auth.php");
+include("../components/auth.php");
+include("../components/header.php");
+
 ?>
 
 <!DOCTYPE html>
@@ -17,13 +19,12 @@ include("components/auth.php");
         <header class="d-flex justify-content-between my-4">
             <h1>生徒一覧</h1>
             <div>
-                <a href="crud/create/create_student.php" class="btn btn-primary">生徒を追加する</a>
-                <a href="index.php" class="btn btn-dark">戻る</a>
+                <a href="../crud/create/create_student.php" class="btn btn-primary">生徒を追加する</a>
+                <a href="../index.php" class="btn btn-dark">戻る</a>
             </div>
         </header>
 
         <?php
-        session_start();
         if (isset($_SESSION['msg'])) {
             echo "<div class='alert alert-success'>{$_SESSION['msg']}</div>";
             unset($_SESSION['msg']);
@@ -44,7 +45,7 @@ include("components/auth.php");
             </thead>
             <tbody>
                 <?php
-                include("conf/connect.php");
+                include("../conf/connect.php");
                 $stmt = $conn->prepare("SELECT * FROM students");
                 $stmt->execute();
                 $result = $stmt->get_result();

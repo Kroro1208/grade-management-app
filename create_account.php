@@ -56,11 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php endif; ?>
                 <form method="post" action="create_account.php">
                     <div class="form-group mb-3">
-                        <label for="first_name">苗字</label>
+                        <label for="first_name">性</label>
                         <input type="text" class="form-control" id="first_name" name="first_name" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="last_name">名前</label>
+                        <label for="last_name">名</label>
                         <input type="text" class="form-control" id="last_name" name="last_name" required>
                     </div>
                     <div class="form-group mb-3">
