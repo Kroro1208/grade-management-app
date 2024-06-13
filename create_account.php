@@ -9,8 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $user_type = $_POST['user_type'];
+    $class_id = ($_POST['class_id'] ?? null); // クラスIDは選択された場合のみ取得
     $grade = $_POST['grade'] ?? null; // 学年は選択された場合のみ取得
-    $class_number = $_POST['class_id'] ?? null; // クラス番号は選択された場合のみ取得
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -19,37 +19,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // クラス情報の登録（class_teacherまたはgrade_headの場合）
-        if ($user_type === 'class_teacher' || $user_type === 'grade_head') {
-            $sql_class = "INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
-            $stmt_class = $conn->prepare($sql_class);
-            $class_name = "{$grade}年 {$class_number}クラス";
-            $stmt_class->bind_param("sss", $class_name, $grade, $class_number);
-            if ($stmt_class->execute()) {
-                $class_id = $conn->insert_id; // 追加されたクラスのIDを取得
-            } else {
-                $error_message = 'Error creating class: ' . $stmt_class->error;
-                $stmt_class->close();
-                exit();
-            }
-            $stmt_class->close();
-        } else {
-            $class_id = null; // 校長の場合はクラスIDをnullに設定
+        // 校長の場合はclass_idをNULLに設定
+        if ($user_type === 'principal') {
+            $class_id = null;
         }
 
-        // 先生情報の登録
-        $sql_teacher = "INSERT INTO teachers (first_name, last_name, user_type, class_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
-        $stmt_teacher = $conn->prepare($sql_teacher);
-        $stmt_teacher->bind_param("sssis", $first_name, $last_name, $user_type, $class_id, $hashed_password);
+        // 学年とクラスの情報をclassesテーブルに登録
+        if ($user_type === 'class_teacher' || $user_type === 'grade_head') {
+            $class_name = "{$grade}年 {$class_id}クラス";
+            $sql_class = "INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
+            $stmt_class = $conn->prepare($sql_class);
+            $stmt_class->bind_param("sss", $class_name, $grade, $class_id);
+            $stmt_class->execute();
+            $class_id = $stmt_class->insert_id; // 新しいクラスIDを取得
+            $stmt_class->close();
+        }
 
-        if ($stmt_teacher->execute()) {
+        $sql = "INSERT INTO teachers (first_name, last_name, user_type, class_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssiss", $first_name, $last_name, $user_type, $class_id, $hashed_password);
+
+        if ($stmt->execute()) {
             $_SESSION['success_message'] = 'アカウントが作成されました';
             header("Location: index.php");
             exit();
         } else {
-            $error_message = 'Error creating account: ' . $stmt_teacher->error;
+            $error_message = 'Error creating account: ' . $stmt->error;
         }
-        $stmt_teacher->close();
+        $stmt->close();
     }
 }
 ?>
