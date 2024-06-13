@@ -1,5 +1,10 @@
 <?php
 include("../../components/header.php");
+include("../../conf/connect.php");
+
+// クラスを取得するクエリ
+$query = "SELECT id, name FROM classes";
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -58,19 +63,19 @@ include("../../components/header.php");
         <form action="../../conf/server.php" method="post">
             <div class="form-element">
                 <label for="last_name" class="form-label">苗字</label>
-                <input class="form-control" type="text" name="last_name" id="last_name" placeholder="苗字">
+                <input class="form-control" type="text" name="last_name" id="last_name" placeholder="苗字" required>
             </div>
             <div class="form-element">
                 <label for="first_name" class="form-label">名前</label>
-                <input class="form-control" type="text" name="first_name" id="first_name" placeholder="名前">
+                <input class="form-control" type="text" name="first_name" id="first_name" placeholder="名前" required>
             </div>
             <div class="form-element">
                 <label for="age" class="form-label">年齢</label>
-                <input class="form-control" type="number" name="age" id="age" placeholder="年齢">
+                <input class="form-control" type="number" name="age" id="age" placeholder="年齢" required>
             </div>
             <div class="form-element">
                 <label for="gender" class="form-label">性別</label>
-                <select name="gender" id="gender" class="form-select">
+                <select name="gender" id="gender" class="form-select" required>
                     <option value="">性別を選択</option>
                     <option value="male">男性</option>
                     <option value="female">女性</option>
@@ -78,7 +83,18 @@ include("../../components/header.php");
             </div>
             <div class="form-element">
                 <label for="birthday" class="form-label">誕生日</label>
-                <input class="form-control" type="date" name="birthday" id="birthday">
+                <input class="form-control" type="date" name="birthday" id="birthday" required>
+            </div>
+            <div class="form-element">
+                <label for="class_id" class="form-label">クラス</label>
+                <select name="class_id" id="class_id" class="form-select" required>
+                    <option value="">クラスを選択</option>
+                    <?php
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
+                    }
+                    ?>
+                </select>
             </div>
             <div class="form-element">
                 <input class="btn btn-primary w-100" type="submit" name="create" value="登録する">
@@ -88,3 +104,7 @@ include("../../components/header.php");
 </body>
 
 </html>
+
+<?php
+$conn->close();
+?>

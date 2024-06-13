@@ -9,13 +9,13 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">成績管理アプリ</a>
             <div class="collapse navbar-collapse justify-content-end">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php">ログアウト</a>
+                        <a class="btn btn-danger" href="logout.php">ログアウト</a>
                     </li>
                 </ul>
             </div>

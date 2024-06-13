@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $id;
             $_SESSION['user_name'] = $first_name . ' ' . $last_name;
             $_SESSION['user_type'] = $user_type;
-            header("Location: pages/index.php");
+            header("Location: index.php");
             exit();
         } else {
             $error_message = 'Invalid password.';
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php if ($error_message) : ?>
                     <div class="alert alert-danger"><?php echo $error_message; ?></div>
                 <?php endif; ?>
-                <form method="post" action="index.php">
+                <form method="post" action="login.php">
                     <div class="form-group mb-3">
                         <label for="first_name">First Name</label>
                         <input type="text" class="form-control" id="first_name" name="first_name" required>
