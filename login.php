@@ -1,7 +1,6 @@
 <?php
 session_start();
 include("conf/connect.php");
-include('components/header.php');
 
 $error_message = '';
 

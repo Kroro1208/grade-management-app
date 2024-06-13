@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse justify-content-end">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="btn btn-danger" href="logout.php">ログアウト</a>
+                        <a class="btn btn-danger" href="<?php echo (strpos($_SERVER['PHP_SELF'], '/pages/') !== false) ? '../logout.php' : 'logout.php'; ?>">ログアウト</a>
                     </li>
                 </ul>
             </div>
