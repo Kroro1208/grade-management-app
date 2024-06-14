@@ -57,7 +57,7 @@ $result = $conn->query($query);
         }
 
         .btn-custom {
-            width: 100%;
+            width: 1/2;
             margin-bottom: 15px;
             padding: 15px;
             font-size: 18px;
@@ -128,7 +128,7 @@ $result = $conn->query($query);
             </div>
             <div class="card-body text-center">
                 <a href="../index.php" class="btn btn-secondary btn-custom btn-secondary-custom">ホームに戻る</a>
-                <a href="download.php" class="btn btn-primary btn-custom btn-primary-custom mt-3">CSVダウンロード</a>
+                <a href="download.php" class="btn btn-primary btn-custom btn-primary-custom">CSVダウンロード</a>
                 <table class="table table-striped table-hover mt-3" id="resultsTable">
                     <thead class="table-dark">
                         <tr>
