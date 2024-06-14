@@ -25,5 +25,5 @@ if (isset($_GET['id'])) {
     $conn->close();
 }
 
-header("Location: ../../index_student.php");
+header("Location: ../../pages/index_student.php");
 exit();
