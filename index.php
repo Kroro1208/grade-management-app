@@ -46,7 +46,7 @@ $result = $conn->query($query);
         <div class="card">
             <div class="card-body text-center">
                 <a href="pages/index_student.php" class="btn btn-success btn-custom btn-success-custom">生徒一覧へ</a>
-                <a href="pages/exams/index.php" class="btn btn-secondary btn-custom btn-secondary-custom">テスト結果一覧へ</a>
+                <a href="exams/index.php" class="btn btn-secondary btn-custom btn-secondary-custom">テスト結果一覧へ</a>
                 <h2 class="mt-4">成績ランキング</h2>
                 <table class="table table-striped table-hover mt-3">
                     <thead class="table-dark">

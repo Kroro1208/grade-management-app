@@ -13,7 +13,7 @@
         <header class="d-flex justify-content-between my-4">
             <h1>成績情報</h1>
             <div>
-                <a href="../../index_student.php" class="btn btn-outline-primary">戻る</a>
+                <a href="../../pages/index_student.php" class="btn btn-outline-primary">戻る</a>
             </div>
         </header>
 
