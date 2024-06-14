@@ -2,9 +2,33 @@
 include("../../components/header.php");
 include("../../conf/connect.php");
 
-// クラスを取得するクエリ
-$query = "SELECT id, name FROM classes";
-$result = $conn->query($query);
+session_start();
+
+$user_type = $_SESSION['user_type'];
+$teacher_id = $_SESSION['user_id'];
+
+if ($user_type === 'class_teacher') {
+    $sql = "SELECT id, name FROM classes WHERE id IN (SELECT class_id FROM teachers WHERE id = ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $teacher_id);
+} elseif ($user_type === 'grade_head') {
+    $sql = "SELECT grade FROM classes WHERE id IN (SELECT class_id FROM teachers WHERE id = ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $teacher_id);
+} elseif ($user_type === 'principal') {
+    $sql = "SELECT id, name FROM classes";
+    $stmt = $conn->prepare($sql);
+} else {
+    $sql = ""; // 不正な役職の場合
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($user_type === 'grade_head') {
+    $row = $result->fetch_assoc();
+    $grade = $row['grade'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -88,10 +112,22 @@ $result = $conn->query($query);
             <div class="form-element">
                 <label for="class_id" class="form-label">クラス</label>
                 <select name="class_id" id="class_id" class="form-select" required>
-                    <option value="">クラスを選択</option>
+                    <option value="">クラスを選択してください</option>
                     <?php
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
+                    if ($user_type === 'grade_head') {
+                        for ($i = 1; $i <= 5; $i++) {
+                            echo "<option value='{$grade}-{$i}クラス'>{$grade}年 {$i}クラス</option>";
+                        }
+                    } elseif ($user_type === 'principal') {
+                        for ($grade = 1; $grade <= 3; $grade++) {
+                            for ($i = 1; $i <= 5; $i++) {
+                                echo "<option value='{$grade}-{$i}クラス'>{$grade}年 {$i}クラス</option>";
+                            }
+                        }
+                    } else {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
+                        }
                     }
                     ?>
                 </select>
@@ -106,5 +142,6 @@ $result = $conn->query($query);
 </html>
 
 <?php
+$stmt->close();
 $conn->close();
 ?>
