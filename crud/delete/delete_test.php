@@ -2,8 +2,9 @@
 session_start();
 include("../../conf/connect.php");
 
-if (isset($_GET['id'])) {
+if (isset($_GET['id']) && isset($_GET['student_id'])) {
     $score_id = intval($_GET['id']);
+    $student_id = intval($_GET['student_id']);  // student_id を取得
 
     // 成績情報を削除
     $stmt = $conn->prepare("DELETE FROM subjects WHERE id = ?");
@@ -16,7 +17,13 @@ if (isset($_GET['id'])) {
 
     $stmt->close();
     $conn->close();
+
+    // student_id をリダイレクトに含める
+    header("Location: ../../pages/index_test.php?student_id=" . $student_id);
+    exit();
 }
 
-header("Location: ../../index_student.php");
+// student_id がない場合のエラーハンドリング
+$_SESSION["msg"] = "成績情報の削除に失敗しました: 無効なリクエストです。";
+header("Location: ../../pages/index_student.php");
 exit();

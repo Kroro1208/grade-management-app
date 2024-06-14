@@ -21,7 +21,7 @@
         $student_id = intval($_GET['student_id']); // URL パラメータから student_id を取得
         ?>
 
-        <form action="../../conf/server.php" method="post" oninput="calculateTotal()">
+        <form action="../../conf/server.php" method="post" onsubmit="return validateScores()">
             <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
 
             <div class="form-element my-4">
@@ -37,19 +37,19 @@
                 </select>
             </div>
             <div class="form-element my-4">
-                <input class="form-control" type="number" name="english" id="english" placeholder="英語の点数">
+                <input class="form-control" type="number" name="english" id="english" placeholder="英語の点数" min="0" max="100" required>
             </div>
             <div class="form-element my-4">
-                <input class="form-control" type="number" name="japanese" id="japanese" placeholder="国語の点数">
+                <input class="form-control" type="number" name="japanese" id="japanese" placeholder="国語の点数" min="0" max="100" required>
             </div>
             <div class="form-element my-4">
-                <input class="form-control" type="number" name="math" id="math" placeholder="数学の点数">
+                <input class="form-control" type="number" name="math" id="math" placeholder="数学の点数" min="0" max="100" required>
             </div>
             <div class="form-element my-4">
-                <input class="form-control" type="number" name="social" id="social" placeholder="社会の点数">
+                <input class="form-control" type="number" name="social" id="social" placeholder="社会の点数" min="0" max="100" required>
             </div>
             <div class="form-element my-4">
-                <input class="form-control" type="number" name="science" id="science" placeholder="理科の点数">
+                <input class="form-control" type="number" name="science" id="science" placeholder="理科の点数" min="0" max="100" required>
             </div>
             <div class="form-element my-4">
                 <input class="form-control" type="text" id="total" placeholder="合計点" readonly>
@@ -60,17 +60,7 @@
         </form>
     </div>
 
-    <script>
-        function calculateTotal() {
-            let english = parseInt(document.getElementById('english').value) || 0;
-            let japanese = parseInt(document.getElementById('japanese').value) || 0;
-            let math = parseInt(document.getElementById('math').value) || 0;
-            let social = parseInt(document.getElementById('social').value) || 0;
-            let science = parseInt(document.getElementById('science').value) || 0;
-            let total = english + japanese + math + social + science;
-            document.getElementById('total').value = total;
-        }
-    </script>
+    <script src="../../main.js"></script>
 </body>
 
 </html>

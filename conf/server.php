@@ -105,7 +105,7 @@ if (isset($_POST["create_test"])) {
     $stmt->close();
     $conn->close();
 
-    header("Location: ../index_student.php");
+    header("Location: ../pages/index_student.php");
     exit();
 }
 

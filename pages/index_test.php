@@ -1,7 +1,15 @@
 <?php
-include("components/auth.php");
+include("../components/auth.php");
+include("../components/header.php");
+
 // データベース接続とクエリの実行
-include("conf/connect.php");
+include("../conf/connect.php");
+
+if (!isset($_GET['student_id'])) {
+    echo "<div class='alert alert-danger'>生徒IDが指定されていません。</div>";
+    exit();
+}
+
 $student_id = intval($_GET['student_id']);
 
 $stmt = $conn->prepare("
@@ -15,7 +23,6 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $student_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +55,7 @@ $result = $stmt->get_result();
                 <h2 class="card-title mb-0"><?php echo htmlspecialchars($student["last_name"] . " " . $student["first_name"], ENT_QUOTES, 'UTF-8'); ?> の成績</h2>
                 <div>
                     <a href="index_student.php" class="btn btn-outline-primary">戻る</a>
-                    <a href="crud/create/create_test.php?student_id=<?php echo $student_id; ?>" class="btn btn-primary">成績を追加する</a>
+                    <a href="../crud/create/create_test.php?student_id=<?php echo $student_id; ?>" class="btn btn-primary">成績を追加する</a>
                 </div>
             </div>
             <div class="card-body">
@@ -80,8 +87,8 @@ $result = $stmt->get_result();
                                 <td><?php echo htmlspecialchars($row["science"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["total"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
-                                    <a href="crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-warning">編集する</a>
-                                    <a href="crud/delete/delete_test.php?id=<?php echo $row["subject_id"]; ?>" class="btn btn-danger" onclick="return confirm('本当にこの成績情報を削除しますか？')">削除する</a>
+                                    <a href="../crud/edit/edit_test.php?test_id=<?php echo $row["test_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-warning">編集する</a>
+                                    <a href="../crud/delete/delete_test.php?id=<?php echo $row["subject_id"]; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-danger" onclick="return confirm('本当にこの成績情報を削除しますか？')">削除する</a>
                                 </td>
                             </tr>
                         <?php
