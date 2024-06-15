@@ -27,18 +27,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_class->execute();
             $class_id = $stmt_class->insert_id;
             $stmt_class->close();
-        }
-
-        // 先生のアカウント登録処理
-        if ($user_type === 'principal' || $user_type === 'grade_head') {
+        } else {
             $sql = "INSERT INTO teachers (first_name, last_name, user_type, password, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssss", $first_name, $last_name, $user_type, $hashed_password);
-        } else {
-            $sql = "INSERT INTO teachers (first_name, last_name, user_type, class_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssis", $first_name, $last_name, $user_type, $class_id, $hashed_password);
         }
+
+        // if ($user_type === 'principal' || $user_type === 'grade_head') {
+        //     $sql = "INSERT INTO teachers (first_name, last_name, user_type, password, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+        //     $stmt = $conn->prepare($sql);
+        //     $stmt->bind_param("ssss", $first_name, $last_name, $user_type, $hashed_password);
+        // } else {
+        //     $sql = "INSERT INTO teachers (first_name, last_name, user_type, class_id, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
+        //     $stmt = $conn->prepare($sql);
+        //     $stmt->bind_param("sssis", $first_name, $last_name, $user_type, $class_id, $hashed_password);
+        // }
 
         if ($stmt->execute()) {
             $teacher_id = $stmt->insert_id; // 登録した先生のIDを取得
