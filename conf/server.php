@@ -12,9 +12,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     $birthday = $_POST['birthday'];
     $class_id = $_POST['class_id'];
 
+    // クラスIDの処理を修正（クラス情報を適切に取得）
+    if (strpos($class_id, '-') !== false) {
+        list($grade, $class_number) = sscanf($class_id, "%d-%d");
+        $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
+        $stmt->bind_param("ii", $grade, $class_number);
+        $stmt->execute();
+        $stmt->bind_result($class_id);
+        $stmt->fetch();
+        $stmt->close();
+    }
+
     $sql = "INSERT INTO students (last_name, first_name, age, gender, birthday, class_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssisss", $last_name, $first_name, $age, $gender, $birthday, $class_id);
+    $stmt->bind_param("ssissi", $last_name, $first_name, $age, $gender, $birthday, $class_id);
 
     if ($stmt->execute()) {
         $_SESSION['msg'] = "生徒情報が登録されました。";
@@ -27,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     $stmt->close();
 }
 
-
 // 生徒情報の更新処理
 if (isset($_POST["update"])) {
     $student_id = intval($_POST["student_id"]);
@@ -36,10 +46,21 @@ if (isset($_POST["update"])) {
     $age = mysqli_real_escape_string($conn, $_POST["age"]);
     $gender = mysqli_real_escape_string($conn, $_POST["gender"]);
     $birthday = mysqli_real_escape_string($conn, $_POST["birthday"]);
+    $class_id = $_POST['class_id'];
 
-    // プリペアドステートメントを使用
-    $stmt = $conn->prepare("UPDATE students SET first_name = ?, last_name = ?, age = ?, gender = ?, birthday = ? WHERE id = ?");
-    $stmt->bind_param("ssissi", $first_name, $last_name, $age, $gender, $birthday, $student_id);
+    // クラスIDの処理を修正（クラス情報を適切に取得）
+    if (strpos($class_id, '-') !== false) {
+        list($grade, $class_number) = sscanf($class_id, "%d-%d");
+        $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
+        $stmt->bind_param("ii", $grade, $class_number);
+        $stmt->execute();
+        $stmt->bind_result($class_id);
+        $stmt->fetch();
+        $stmt->close();
+    }
+
+    $stmt = $conn->prepare("UPDATE students SET first_name = ?, last_name = ?, age = ?, gender = ?, birthday = ?, class_id = ? WHERE id = ?");
+    $stmt->bind_param("ssissii", $first_name, $last_name, $age, $gender, $birthday, $class_id, $student_id);
 
     if ($stmt->execute()) {
         $_SESSION["msg"] = "生徒情報の更新が成功しました";
@@ -50,7 +71,7 @@ if (isset($_POST["update"])) {
     $stmt->close();
     $conn->close();
 
-    header("Location: ../index_student.php");
+    header("Location: ../pages/index_student.php");
     exit();
 }
 
@@ -156,6 +177,6 @@ if (isset($_POST["update_test"])) {
     $stmt->close();
     $conn->close();
 
-    header("Location: ../index_student.php");
+    header("Location: ../pages/index_student.php");
     exit();
 }

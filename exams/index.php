@@ -1,6 +1,7 @@
 <?php
 session_start();
 // データベース接続
+include("../components/header.php");
 include("../conf/connect.php");
 
 // テスト結果を取得するクエリ
@@ -167,60 +168,7 @@ $result = $conn->query($query);
         </div>
     </div>
 
-    <script>
-        function sortTable(columnIndex, isNumeric = false) {
-            const table = document.getElementById("resultsTable");
-            let dir = "asc";
-            let rows, i, x, y;
-            let sortCount = 0;
-            let sorted = true; // ソートが完了したかどうかのフラグ
-            let shouldSort = false; // 次の行と比較して並び替えが必要かどうかを判断するフラグ
-
-            // ソートが必要ないか、すべてのソートが完了するまでループ
-            while (sorted) {
-                sorted = false; // ループの開始時にフラグをリセット
-                rows = table.rows;
-
-                // テーブルの各行をループ処理
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSort = false; // ループの開始時にフラグをリセット
-                    x = rows[i].getElementsByTagName("td")[columnIndex];
-                    y = rows[i + 1].getElementsByTagName("td")[columnIndex];
-
-                    // 数値か文字列かによって比較方法を変更
-                    if (dir === "asc") {
-                        if ((isNumeric && parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) ||
-                            (!isNumeric && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())) {
-                            shouldSort = true;
-                            break;
-                        }
-                    } else if (dir === "desc") {
-                        if ((isNumeric && parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) ||
-                            (!isNumeric && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())) {
-                            shouldSort = true;
-                            break;
-                        }
-                    }
-                }
-
-                // shouldSortフラグがtrueの場合、行を入れ替える
-                if (shouldSort) {
-                    // table.rowsが<tr>を含むすべての要素
-                    // insertBeforeは、親ノードである<tbody>の子ノードの順序を変更する。
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    sorted = true;
-                    sortCount++;
-                } else {
-                    // ソート失敗時
-                    if (sortCount === 0 && dir === "asc") {
-                        dir = "desc";
-                        sorted = true;
-                    }
-                }
-            }
-        }
-    </script>
-
+    <script script="../main.js"></script>
 </body>
 
 </html>

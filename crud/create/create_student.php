@@ -7,27 +7,16 @@ session_start();
 $user_type = $_SESSION['user_type'];
 $teacher_id = $_SESSION['user_id'];
 
-if ($user_type === 'class_teacher') {
-    $sql = "SELECT id, name FROM classes WHERE id IN (SELECT class_id FROM teachers WHERE id = ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $teacher_id);
-} elseif ($user_type === 'grade_head') {
-    $sql = "SELECT grade FROM classes WHERE id IN (SELECT class_id FROM teachers WHERE id = ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $teacher_id);
-} elseif ($user_type === 'principal') {
-    $sql = "SELECT id, name FROM classes";
-    $stmt = $conn->prepare($sql);
-} else {
-    $sql = ""; // 不正な役職の場合
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
-
+// grade_headのために担当学年を取得
+$grade = null;
 if ($user_type === 'grade_head') {
-    $row = $result->fetch_assoc();
-    $grade = $row['grade'];
+    $sql = "SELECT grade FROM grade_assignments WHERE teacher_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $teacher_id);
+    $stmt->execute();
+    $stmt->bind_result($grade);
+    $stmt->fetch();
+    $stmt->close();
 }
 ?>
 
@@ -114,20 +103,26 @@ if ($user_type === 'grade_head') {
                 <select name="class_id" id="class_id" class="form-select" required>
                     <option value="">クラスを選択してください</option>
                     <?php
-                    if ($user_type === 'grade_head') {
+                    if ($user_type === 'grade_head' && $grade !== null) {
                         for ($i = 1; $i <= 5; $i++) {
-                            echo "<option value='{$grade}-{$i}クラス'>{$grade}年 {$i}クラス</option>";
+                            echo "<option value='{$grade}-{$i}'>{$grade}年 {$i}クラス</option>";
                         }
                     } elseif ($user_type === 'principal') {
                         for ($grade = 1; $grade <= 3; $grade++) {
                             for ($i = 1; $i <= 5; $i++) {
-                                echo "<option value='{$grade}-{$i}クラス'>{$grade}年 {$i}クラス</option>";
+                                echo "<option value='{$grade}-{$i}'>{$grade}年 {$i}クラス</option>";
                             }
                         }
                     } else {
+                        $sql = "SELECT id, name FROM classes WHERE id IN (SELECT class_id FROM teachers WHERE id = ?)";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("i", $teacher_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
                         while ($row = $result->fetch_assoc()) {
                             echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
                         }
+                        $stmt->close();
                     }
                     ?>
                 </select>
@@ -142,6 +137,5 @@ if ($user_type === 'grade_head') {
 </html>
 
 <?php
-$stmt->close();
 $conn->close();
 ?>

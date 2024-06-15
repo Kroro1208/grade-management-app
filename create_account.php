@@ -9,8 +9,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $user_type = $_POST['user_type'];
-    $class_id = ($_POST['class_id'] ?? null); // クラスIDは選択された場合のみ取得
-    $grade = $_POST['grade'] ?? null; // 学年は選択された場合のみ取得
+    $class_id = $_POST['class_id'] ?? null;
+    $grade = $_POST['grade'] ?? null;
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -19,31 +19,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // 校長または学年主任の場合はclass_idをNULLに設定
-        if ($user_type === 'principal' || $user_type === 'grade_head') {
-            $class_id = null;
-        }
-
-        // 学年とクラスの情報をclassesテーブルに登録(class_teacherの場合)
         if ($user_type === 'class_teacher') {
             $class_name = "{$grade}年 {$class_id}クラス";
             $sql_class = "INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())";
             $stmt_class = $conn->prepare($sql_class);
             $stmt_class->bind_param("sss", $class_name, $grade, $class_id);
             $stmt_class->execute();
-            $class_id = $stmt_class->insert_id; // 新しいクラスIDを取得
-            $stmt_class->close();
-        } elseif ($user_type === 'grade_head') {
-            $class_name = "{$grade}年";
-            $sql_class = "INSERT INTO classes (name, grade, created_at, updated_at) VALUES (?, ?, NOW(), NOW())";
-            $stmt_class = $conn->prepare($sql_class);
-            $stmt_class->bind_param("ss", $class_name, $grade);
-            $stmt_class->execute();
-            $class_id = $stmt_class->insert_id; // 新しいクラスIDを取得
+            $class_id = $stmt_class->insert_id;
             $stmt_class->close();
         }
 
-        // ティーチャーズテーブルにデータを挿入(principal or grade_headの場合)
+        // 先生のアカウント登録処理
         if ($user_type === 'principal' || $user_type === 'grade_head') {
             $sql = "INSERT INTO teachers (first_name, last_name, user_type, password, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
             $stmt = $conn->prepare($sql);
@@ -55,7 +41,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($stmt->execute()) {
+            $teacher_id = $stmt->insert_id; // 登録した先生のIDを取得
             $_SESSION['success_message'] = 'アカウントが作成されました';
+
+            // grade_head の場合に grade_assignments テーブルに登録する
+            if ($user_type === 'grade_head') {
+                $sql_grade_assignment = "INSERT INTO grade_assignments (teacher_id, grade) VALUES (?, ?)";
+                $stmt_grade_assignment = $conn->prepare($sql_grade_assignment);
+                $stmt_grade_assignment->bind_param("ii", $teacher_id, $grade);
+                $stmt_grade_assignment->execute();
+                $stmt_grade_assignment->close();
+            }
+
             header("Location: index.php");
             exit();
         } else {
