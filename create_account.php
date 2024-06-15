@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_class->execute();
             $class_id = $stmt_class->insert_id;
             $stmt_class->close();
-        } else {
+        } else { // grade_headとprincipalの場合
             $sql = "INSERT INTO teachers (first_name, last_name, user_type, password, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssss", $first_name, $last_name, $user_type, $hashed_password);
