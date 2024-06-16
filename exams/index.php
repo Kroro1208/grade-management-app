@@ -167,8 +167,7 @@ $result = $conn->query($query);
             </div>
         </div>
     </div>
-
-    <script script="../main.js"></script>
+    <script src="../main.js"></script>
 </body>
 
 </html>
