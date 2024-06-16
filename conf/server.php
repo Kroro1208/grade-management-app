@@ -14,17 +14,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
 
     // クラス情報が正しい形式かどうかをチェック
     if (strpos($class_info, '-') !== false) {
-        list($grade, $class_number) = sscanf($class_info, "%d-%d"); // 修正: フォーマットを修正
+        list($grade, $class_number) = sscanf($class_info, "%d-%d");
 
         // クエリを実行してクラスIDを取得
         $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
-        $stmt->bind_param("ii", $grade, $class_number); // 修正: パラメータタイプをiiに変更
+        $stmt->bind_param("ii", $grade, $class_number);
         $stmt->execute();
         $stmt->bind_result($class_id);
         $stmt->fetch();
         $stmt->close();
+
+        // クラスIDが取得できなかった場合の処理
+        if (empty($class_id)) {
+            // クラスが存在しないため、新しいクラスを挿入
+            $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+            $class_name = "{$grade}年 {$class_number}クラス";
+            $stmt->bind_param("sii", $class_name, $grade, $class_number);
+            $stmt->execute();
+            $class_id = $stmt->insert_id;
+            $stmt->close();
+        }
+    } elseif (is_numeric($class_info)) { // class_teacherの場合、class_idを直接使用
+        $class_id = intval($class_info);
     } else {
         echo "エラー: クラス情報が無効です。";
+        exit();
+    }
+
+    // ここでクラスIDが存在することを確認
+    if (empty($class_id)) {
+        echo "エラー: クラスIDが無効です。";
         exit();
     }
 
@@ -59,11 +78,33 @@ if (isset($_POST["update"])) {
 
         // クラスIDの取得
         $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
-        $stmt->bind_param("ii", $grade, $class_number); // 修正: パラメータタイプをiiに変更
+        $stmt->bind_param("ii", $grade, $class_number);
         $stmt->execute();
         $stmt->bind_result($class_id);
         $stmt->fetch();
         $stmt->close();
+
+        // クラスIDが取得できなかった場合の処理
+        if (empty($class_id)) {
+            // クラスが存在しないため、新しいクラスを挿入
+            $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+            $class_name = "{$grade}年 {$class_number}クラス";
+            $stmt->bind_param("sii", $class_name, $grade, $class_number);
+            $stmt->execute();
+            $class_id = $stmt->insert_id;
+            $stmt->close();
+        }
+    } elseif (is_numeric($class_info)) { // class_teacherの場合、class_idを直接使用
+        $class_id = intval($class_info);
+    } else {
+        echo "エラー: クラス情報が無効です。";
+        exit();
+    }
+
+    // クラスIDが正しく設定されているか確認
+    if (empty($class_id)) {
+        echo "エラー: クラスIDが無効です。";
+        exit();
     }
 
     $stmt = $conn->prepare("UPDATE students SET first_name = ?, last_name = ?, age = ?, gender = ?, birthday = ?, class_id = ? WHERE id = ?");
