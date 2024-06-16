@@ -54,8 +54,8 @@ if (isset($_POST["update"])) {
     $birthday = mysqli_real_escape_string($conn, $_POST["birthday"]);
     $class_info = $_POST['class_id'];
 
-    if (strpos($class_info, '-') !== false) { // 修正: '年'から'-'に変更
-        list($grade, $class_number) = sscanf($class_info, "%d-%d"); // 修正: フォーマットを修正
+    if (strpos($class_info, '-') !== false) {
+        list($grade, $class_number) = sscanf($class_info, "%d-%d");
 
         // クラスIDの取得
         $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
@@ -64,22 +64,6 @@ if (isset($_POST["update"])) {
         $stmt->bind_result($class_id);
         $stmt->fetch();
         $stmt->close();
-
-        // クラスが存在しない場合、新しく挿入
-        if (empty($class_id)) {
-            $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
-            $class_name = "{$grade}年 {$class_number}クラス";
-            $stmt->bind_param("sii", $class_name, $grade, $class_number); // 修正: パラメータタイプをsiiに変更
-            $stmt->execute();
-            $class_id = $stmt->insert_id;
-            $stmt->close();
-        }
-    }
-
-    // クラスIDが正しく設定されているか確認
-    if (empty($class_id)) {
-        echo "エラー: クラス情報が無効です。";
-        exit();
     }
 
     $stmt = $conn->prepare("UPDATE students SET first_name = ?, last_name = ?, age = ?, gender = ?, birthday = ?, class_id = ? WHERE id = ?");
@@ -97,6 +81,7 @@ if (isset($_POST["update"])) {
     header("Location: ../pages/index_student.php");
     exit();
 }
+
 
 // テストと成績の登録処理
 if (isset($_POST["create_test"])) {

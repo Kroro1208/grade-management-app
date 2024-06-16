@@ -35,6 +35,7 @@ include("../components/header.php");
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>学年とクラス</th>
                     <th>苗字</th>
                     <th>名前</th>
                     <th>年齢</th>
@@ -46,7 +47,18 @@ include("../components/header.php");
             <tbody>
                 <?php
                 include("../conf/connect.php");
-                $stmt = $conn->prepare("SELECT * FROM students");
+                $stmt = $conn->prepare("
+                    SELECT 
+                        students.*, 
+                        classes.grade, 
+                        classes.class_number 
+                    FROM 
+                        students 
+                    JOIN 
+                        classes 
+                    ON 
+                        students.class_id = classes.id
+                ");
                 $stmt->execute();
                 $result = $stmt->get_result();
 
@@ -55,6 +67,7 @@ include("../components/header.php");
                 ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row["id"], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($row["grade"], ENT_QUOTES, 'UTF-8') . "年 " . htmlspecialchars($row["class_number"], ENT_QUOTES, 'UTF-8') . "クラス"; ?></td>
                         <td><?php echo htmlspecialchars($row["last_name"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["first_name"], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($row["age"], ENT_QUOTES, 'UTF-8'); ?></td>
