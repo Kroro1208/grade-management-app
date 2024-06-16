@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
         $stmt->fetch();
         $stmt->close();
 
-        // クラスIDが取得できなかった場合の処理
+        // 各クラス初回登録時の処理
         if (empty($class_id)) {
             // クラスが存在しないため、新しいクラスを挿入
             $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
@@ -84,7 +84,7 @@ if (isset($_POST["update"])) {
         $stmt->fetch();
         $stmt->close();
 
-        // クラスIDが取得できなかった場合の処理
+        // 各クラス初回登録時の処理
         if (empty($class_id)) {
             // クラスが存在しないため、新しいクラスを挿入
             $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
