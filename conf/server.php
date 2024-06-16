@@ -10,19 +10,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create'])) {
     $age = $_POST['age'];
     $gender = $_POST['gender'];
     $birthday = $_POST['birthday'];
-    $class_id = $_POST['class_id'];
+    $class_info = $_POST['class_id'];
 
-    // クラスIDの処理を修正（クラス情報を適切に取得）
-    if (strpos($class_id, '-') !== false) {
-        list($grade, $class_number) = sscanf($class_id, "%d-%d");
+    // クラス情報が正しい形式かどうかをチェック
+    if (strpos($class_info, '-') !== false) { // 修正: '年'から'-'に変更
+        list($grade, $class_number) = sscanf($class_info, "%d-%d"); // 修正: フォーマットを修正
+
+        // クエリを実行してクラスIDを取得
         $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
-        $stmt->bind_param("ii", $grade, $class_number);
+        $stmt->bind_param("ii", $grade, $class_number); // 修正: パラメータタイプをiiに変更
         $stmt->execute();
         $stmt->bind_result($class_id);
         $stmt->fetch();
         $stmt->close();
+
+        // クラスIDが取得できなかった場合の処理
+        if (empty($class_id)) {
+            // クラスが存在しないため、新しいクラスを挿入
+            $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+            $class_name = "{$grade}年 {$class_number}クラス";
+            $stmt->bind_param("sii", $class_name, $grade, $class_number); // 修正: パラメータタイプをsiiに変更
+            $stmt->execute();
+            $class_id = $stmt->insert_id;
+            $stmt->close();
+        }
+    } else {
+        echo "エラー: クラス情報が無効です。";
+        exit();
     }
 
+    // ここでクラスIDが存在することを確認
+    if (empty($class_id)) {
+        echo "エラー: クラスIDが無効です。";
+        exit();
+    }
+
+    // 生徒情報を挿入する
     $sql = "INSERT INTO students (last_name, first_name, age, gender, birthday, class_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssissi", $last_name, $first_name, $age, $gender, $birthday, $class_id);
@@ -46,17 +69,34 @@ if (isset($_POST["update"])) {
     $age = mysqli_real_escape_string($conn, $_POST["age"]);
     $gender = mysqli_real_escape_string($conn, $_POST["gender"]);
     $birthday = mysqli_real_escape_string($conn, $_POST["birthday"]);
-    $class_id = $_POST['class_id'];
+    $class_info = $_POST['class_id'];
 
-    // クラスIDの処理を修正（クラス情報を適切に取得）
-    if (strpos($class_id, '-') !== false) {
-        list($grade, $class_number) = sscanf($class_id, "%d-%d");
+    if (strpos($class_info, '-') !== false) { // 修正: '年'から'-'に変更
+        list($grade, $class_number) = sscanf($class_info, "%d-%d"); // 修正: フォーマットを修正
+
+        // クラスIDの取得
         $stmt = $conn->prepare("SELECT id FROM classes WHERE grade = ? AND class_number = ?");
-        $stmt->bind_param("ii", $grade, $class_number);
+        $stmt->bind_param("ii", $grade, $class_number); // 修正: パラメータタイプをiiに変更
         $stmt->execute();
         $stmt->bind_result($class_id);
         $stmt->fetch();
         $stmt->close();
+
+        // クラスが存在しない場合、新しく挿入
+        if (empty($class_id)) {
+            $stmt = $conn->prepare("INSERT INTO classes (name, grade, class_number, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+            $class_name = "{$grade}年 {$class_number}クラス";
+            $stmt->bind_param("sii", $class_name, $grade, $class_number); // 修正: パラメータタイプをsiiに変更
+            $stmt->execute();
+            $class_id = $stmt->insert_id;
+            $stmt->close();
+        }
+    }
+
+    // クラスIDが正しく設定されているか確認
+    if (empty($class_id)) {
+        echo "エラー: クラス情報が無効です。";
+        exit();
     }
 
     $stmt = $conn->prepare("UPDATE students SET first_name = ?, last_name = ?, age = ?, gender = ?, birthday = ?, class_id = ? WHERE id = ?");
@@ -177,6 +217,6 @@ if (isset($_POST["update_test"])) {
     $stmt->close();
     $conn->close();
 
-    header("Location: ../pages/index_student.php");
+    header("Location: ../index_student.php");
     exit();
 }
