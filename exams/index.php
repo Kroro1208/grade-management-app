@@ -4,11 +4,16 @@ session_start();
 include("../components/header.php");
 include("../conf/connect.php");
 
+$user_type = $_SESSION['user_type'];
+$teacher_id = $_SESSION['user_id'];
+
 // テスト結果を取得するクエリ
 $query = "
     SELECT 
         s.id AS student_id, 
         CONCAT(s.last_name, ' ', s.first_name) AS student_name, 
+        c.grade, 
+        c.class_number, 
         tt.name AS test_type, 
         sub.english, 
         sub.math, 
@@ -18,11 +23,26 @@ $query = "
         (sub.english + sub.math + sub.science + sub.social + sub.japanese) AS total_score
     FROM subjects sub
     JOIN students s ON sub.student_id = s.id
+    JOIN classes c ON s.class_id = c.id
     JOIN tests t ON sub.test_id = t.id
     JOIN test_types tt ON t.test_type_id = tt.id
 ";
 
-$result = $conn->query($query);
+// 先生の種類に応じてクエリを追加
+if ($user_type === 'class_teacher') {
+    $query .= " WHERE c.id IN (SELECT class_id FROM teachers WHERE id = ?)";
+} elseif ($user_type === 'grade_head') {
+    $query .= " WHERE c.grade IN (SELECT grade FROM grade_assignments WHERE teacher_id = ?)";
+}
+
+$stmt = $conn->prepare($query);
+
+if ($user_type === 'class_teacher' || $user_type === 'grade_head') {
+    $stmt->bind_param("i", $teacher_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -135,13 +155,14 @@ $result = $conn->query($query);
                         <tr>
                             <th onclick="sortTable(0, true)">学生番号<i class="bi bi-caret-down-fill sort-icon"></i></th>
                             <th onclick="sortTable(1)">テスト<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(2)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(3, true)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(4, true)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(5, true)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(6, true)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(7, true)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(8, true)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(2)">学年とクラス<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(3)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(4, true)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(5, true)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(6, true)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(7, true)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(8, true)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(9, true)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -151,6 +172,7 @@ $result = $conn->query($query);
                             <tr>
                                 <td><?php echo htmlspecialchars($row["student_id"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["test_type"], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($row["grade"], ENT_QUOTES, 'UTF-8') . "年 " . htmlspecialchars($row["class_number"], ENT_QUOTES, 'UTF-8') . "クラス"; ?></td>
                                 <td><?php echo htmlspecialchars($row["student_name"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["english"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["math"], ENT_QUOTES, 'UTF-8'); ?></td>
