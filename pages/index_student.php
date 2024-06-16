@@ -1,7 +1,43 @@
 <?php
 include("../components/auth.php");
 include("../components/header.php");
+include("../conf/connect.php");
 
+// ログインしている先生のIDとタイプを取得
+$teacher_id = $_SESSION['user_id'];
+$user_type = $_SESSION['user_type'];
+
+// クエリを構築
+$query = "
+    SELECT 
+        students.*, 
+        classes.grade, 
+        classes.class_number 
+    FROM 
+        students 
+    JOIN 
+        classes 
+    ON 
+        students.class_id = classes.id
+";
+
+// 先生のタイプに応じて条件を追加
+if ($user_type === 'class_teacher') {
+    $query .= " WHERE classes.id IN (SELECT class_id FROM teachers WHERE id = ?)";
+} elseif ($user_type === 'grade_head') {
+    $query .= " WHERE classes.grade IN (SELECT grade FROM grade_assignments WHERE teacher_id = ?)";
+}
+
+// ステートメントを準備
+$stmt = $conn->prepare($query);
+
+// バインドパラメータを設定
+if ($user_type !== 'principal') {
+    $stmt->bind_param("i", $teacher_id);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -46,22 +82,6 @@ include("../components/header.php");
             </thead>
             <tbody>
                 <?php
-                include("../conf/connect.php");
-                $stmt = $conn->prepare("
-                    SELECT 
-                        students.*, 
-                        classes.grade, 
-                        classes.class_number 
-                    FROM 
-                        students 
-                    JOIN 
-                        classes 
-                    ON 
-                        students.class_id = classes.id
-                ");
-                $stmt->execute();
-                $result = $stmt->get_result();
-
                 while ($row = $result->fetch_assoc()) {
                     $gender_display = ($row["gender"] == "male") ? "男性" : (($row["gender"] == "female") ? "女性" : "不明");
                 ?>
