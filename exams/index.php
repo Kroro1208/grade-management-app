@@ -35,6 +35,8 @@ if ($user_type === 'class_teacher') {
     $query .= " WHERE c.grade IN (SELECT grade FROM grade_assignments WHERE teacher_id = ?)";
 }
 
+$query .= " ORDER BY total_score DESC"; // 合計点数で並び替え
+
 $stmt = $conn->prepare($query);
 
 if ($user_type === 'class_teacher' || $user_type === 'grade_head') {
@@ -43,6 +45,9 @@ if ($user_type === 'class_teacher' || $user_type === 'grade_head') {
 
 $stmt->execute();
 $result = $stmt->get_result();
+$students = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -52,6 +57,7 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- FontAwesomeのリンクを追加 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <title>テスト結果一覧</title>
     <style>
@@ -138,6 +144,10 @@ $result = $stmt->get_result();
             opacity: 1;
             transform: rotate(180deg);
         }
+
+        .ranking-icon {
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -153,23 +163,34 @@ $result = $stmt->get_result();
                 <table class="table table-striped table-hover mt-3" id="resultsTable">
                     <thead class="table-dark">
                         <tr>
-                            <th onclick="sortTable(0, true)">学生番号<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(1)">テスト<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(2)">学年とクラス<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(3)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(4, true)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(5, true)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(6, true)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(7, true)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(8, true)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
-                            <th onclick="sortTable(9, true)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th>ランク</th>
+                            <th onclick="sortTable(1, true)">学生番号<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(2)">テスト<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(3)">学年とクラス<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(4)">名前<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(5, true)">英語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(6, true)">数学<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(7, true)">理科<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(8, true)">社会<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(9, true)">国語<i class="bi bi-caret-down-fill sort-icon"></i></th>
+                            <th onclick="sortTable(10, true)">合計<i class="bi bi-caret-down-fill sort-icon"></i></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        while ($row = $result->fetch_assoc()) {
+                        foreach ($students as $index => $row) {
+                            $rank = $index + 1;
+                            $ranking_icon = '';
+                            if ($rank == 1) {
+                                $ranking_icon = '<i class="fa-solid fa-1 ranking-icon"></i>';
+                            } elseif ($rank == 2) {
+                                $ranking_icon = '<i class="fa-solid fa-2 ranking-icon"></i>';
+                            } elseif ($rank == 3) {
+                                $ranking_icon = '<i class="fa-solid fa-3 ranking-icon"></i>';
+                            }
                         ?>
                             <tr>
+                                <td><?php echo $ranking_icon; ?></td>
                                 <td><?php echo htmlspecialchars($row["student_id"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["test_type"], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row["grade"], ENT_QUOTES, 'UTF-8') . "年 " . htmlspecialchars($row["class_number"], ENT_QUOTES, 'UTF-8') . "クラス"; ?></td>
